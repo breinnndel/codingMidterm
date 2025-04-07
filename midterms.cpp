@@ -13,7 +13,6 @@ private:
 public:
     static int nextID;
 
-   
     Item(string n, int q, double p) {
         id = nextID++;
         name = n;
@@ -21,17 +20,14 @@ public:
         price = p;
     }
 
-   
     int getID() const { return id; }
     string getName() const { return name; }
     int getQuantity() const { return quantity; }
     double getPrice() const { return price; }
 
-    
     void setQuantity(int q) { quantity = q; }
     void setPrice(double p) { price = p; }
 
-   
     void display() const {
         cout << setw(4) << id
              << setw(20) << name
@@ -44,6 +40,25 @@ public:
 int Item::nextID = 1;
 
 vector<Item*> inventory;
+
+void bubbleSortByQuantityAndPrice() {
+    int n = inventory.size();
+    for (int i = 0; i < n - 1; ++i) {
+        for (int j = 0; j < n - i - 1; ++j) {
+            bool shouldSwap = false;
+            if (inventory[j]->getQuantity() > inventory[j + 1]->getQuantity()) {
+                shouldSwap = true;
+            } else if (inventory[j]->getQuantity() == inventory[j + 1]->getQuantity() &&
+                       inventory[j]->getPrice() > inventory[j + 1]->getPrice()) {
+                shouldSwap = true;
+            }
+
+            if (shouldSwap) {
+                swap(inventory[j], inventory[j + 1]);
+            }
+        }
+    }
+}
 
 void addItem() {
     string name;
@@ -115,6 +130,8 @@ void displayAllItems() {
         return;
     }
 
+    bubbleSortByQuantityAndPrice();  
+
     cout << setw(5) << "ID"
          << setw(20) << "Name"
          << setw(23) << "Quantity"
@@ -173,7 +190,7 @@ void menu() {
 
 int main() {
     menu();
-    // cleanup memory
+    
     for (auto& item : inventory) {
         delete item;
     }
