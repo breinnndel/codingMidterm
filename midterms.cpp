@@ -2,33 +2,37 @@
 #include <vector>
 #include <iomanip>
 #include <algorithm>
+#include <string>
 using namespace std;
 
 class Item {
 private:
-    int id;
-    string name;
-    int quantity;
-    double price;
-    string category;
+    int id;            
+    string name;       
+    int quantity;      
+    double price;      
+    string category;  
 
 public:
-    static int nextID;
+    static int nextID;  
 
+   
     Item(string n, int q, double p, string c) {
-        id = nextID++;
-        name = n;
-        quantity = q;
-        price = p;
-        category = c;
+        id = nextID++;      
+        name = n;           
+        quantity = q;       
+        price = p;          
+        category = c;       
     }
 
+    
     int getID() const { return id; }
     string getName() const { return name; }
     int getQuantity() const { return quantity; }
     double getPrice() const { return price; }
     string getCategory() const { return category; }
 
+    
     void setQuantity(int q) { quantity = q; }
     void setPrice(double p) { price = p; }
     void setCategory(string c) { category = c; }
@@ -43,32 +47,38 @@ public:
     }
 };
 
+// Static initialization ng nextID pagkuha ng sunod na ID
 int Item::nextID = 1;
 
-vector<Item*> inventory;
+vector<Item*> inventory;  
 
-void bubbleSort(int choice) {
+// Bubble sort function na naka base sa pagpili (quantity o price)
+void bubbleSort(int choice, bool isDescending) {
     int n = inventory.size();
     for (int i = 0; i < n - 1; ++i) {
         for (int j = 0; j < n - i - 1; ++j) {
             bool shouldSwap = false;
 
-            if (choice == 1) {
-                if (inventory[j]->getQuantity() > inventory[j + 1]->getQuantity()) {
+            if (choice == 1) {  // Pagsort base sa quantity
+                if ((isDescending && inventory[j]->getQuantity() < inventory[j + 1]->getQuantity()) ||
+                    (!isDescending && inventory[j]->getQuantity() > inventory[j + 1]->getQuantity())) {
                     shouldSwap = true;
                 }
-            } else if (choice == 2) {
-                if (inventory[j]->getPrice() > inventory[j + 1]->getPrice()) {
+            } else if (choice == 2) {  // Pagsort base sa price
+                if ((isDescending && inventory[j]->getPrice() < inventory[j + 1]->getPrice()) ||
+                    (!isDescending && inventory[j]->getPrice() > inventory[j + 1]->getPrice())) {
                     shouldSwap = true;
                 }
             }
 
+            
             if (shouldSwap) {
                 swap(inventory[j], inventory[j + 1]);
             }
         }
     }
 }
+
 
 void addItem() {
     string name, category;
@@ -79,17 +89,19 @@ void addItem() {
     cout << "enter quantity: "; cin >> quantity;
     cout << "enter price: "; cin >> price;
 
+    
     inventory.push_back(new Item(name, quantity, price, category));
     cout << "item added successfully!" << endl;
 }
+
 
 bool removeItem() {
     int id;
     cout << "enter product ID: "; cin >> id;
     for (auto it = inventory.begin(); it != inventory.end(); ++it) {
         if ((*it)->getID() == id) {
-            delete *it;
-            inventory.erase(it);
+            delete *it;       
+            inventory.erase(it);  
             cout << "item removed successfully!" << endl;
             return true;
         }
@@ -97,6 +109,7 @@ bool removeItem() {
     cout << "item not found!" << endl;
     return false;
 }
+
 
 void updateItem() {
     int id, newValue;
@@ -121,6 +134,7 @@ void updateItem() {
     cout << "item not found!" << endl;
 }
 
+
 void searchItem() {
     int id;
     cout << "enter product ID: "; cin >> id;
@@ -138,6 +152,7 @@ void searchItem() {
     cout << "item cannot be found!" << endl;
 }
 
+
 void displayAllItems() {
     if (inventory.empty()) {
         cout << "no items found in inventory." << endl;
@@ -150,11 +165,13 @@ void displayAllItems() {
          << setw(26) << "Price"
          << setw(15) << "Category" << endl;
 
+    
     for (const auto& item : inventory) {
         item->display();
     }
 }
 
+// para magdisplay ng low stock items na less than 5 or equal sa 5
 void displayLowStock() {
     cout << "low stock items (Quantity <= 5):" << endl;
     bool found = false;
@@ -178,13 +195,22 @@ void displayLowStock() {
     }
 }
 
+// Function para mag-sort ng items base sa quantity o price at descending o ascending
 void sortItems() {
     int sortChoice;
+    char orderChoice;
     cout << "Sort items by (1) Quantity or (2) Price? "; cin >> sortChoice;
-    bubbleSort(sortChoice);
+
+    
+    cout << "Sort in ascending (A) or descending (D) order? ";
+    cin >> orderChoice;
+
+    bool isDescending = (orderChoice == 'D' || orderChoice == 'd');
+    bubbleSort(sortChoice, isDescending); 
     cout << "Items sorted successfully!" << endl;
 }
 
+// Menu function kung saan pipili ng options
 void menu() {
     int choice;
     do {
@@ -199,6 +225,11 @@ void menu() {
         cout << "8 - exit" << endl;
         cout << "enter choice: "; cin >> choice;
 
+        if (choice < 1 || choice > 8) {
+            cout << "Invalid choice! Exiting program..." << endl;
+            break;
+        }
+
         switch (choice) {
             case 1: addItem(); break;
             case 2: updateItem(); break;
@@ -210,12 +241,14 @@ void menu() {
             case 8: cout << "exiting program..." << endl; break;
             default: cout << "invalid! try again." << endl;
         }
-    } while (choice != 8);
+    } while (choice >= 1 && choice <= 8); 
 }
 
-int main() {
-    menu();
 
+int main() {
+    menu(); // pag tinawag maglloop yung buong program
+
+    
     for (auto& item : inventory) {
         delete item;
     }
